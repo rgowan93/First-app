@@ -1,6 +1,6 @@
 /* Service worker — app shell cache, network-first for APIs */
 
-const CACHE = 'cbh-v0.1.0';
+const CACHE = 'cbh-v0.2.0';
 const SHELL = [
   './',
   './index.html',
@@ -11,8 +11,12 @@ const SHELL = [
   './js/auth.js',
   './js/apis.js',
   './js/ocr.js',
+  './js/analytics.js',
   './js/portfolio.js',
   './js/marketplace.js',
+  './js/watchlist.js',
+  './js/customers.js',
+  './js/share.js',
   './js/ui.js',
   './js/main.js',
 ];

@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="mobile-web-app-capable" content="yes" />
-<meta name="description" content="CARDBOARD HUNTERS — TCG price scanner, portfolio, buy lists, and protected marketplace." />
+<meta name="description" content="CARDBOARD HUNTERS — TCG pricing, portfolio, buy lists, marketplace, market intelligence." />
 <title>CARDBOARD HUNTERS</title>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/svg+xml" href="assets/icon.svg" />
@@ -79,22 +79,20 @@
     <span>CARDBOARD <em>HUNTERS</em></span>
   </div>
   <div class="topbar-spacer"></div>
-  <button class="icon-btn" id="buylist-btn" aria-label="Buy list">
-    🛒<span class="badge" id="buylist-badge">0</span>
-  </button>
+  <button class="icon-btn" id="watch-btn" aria-label="Watchlist" title="Watchlist">⭐<span class="badge zero" id="watch-badge">0</span></button>
+  <button class="icon-btn" id="buylist-btn" aria-label="Buy list">🛒<span class="badge zero" id="buylist-badge">0</span></button>
   <button class="icon-btn" id="settings-btn" aria-label="Settings">⚙</button>
 </header>
 
-<!-- ============ GAME ============ -->
+<!-- ============ APP ============ -->
 <main id="app" class="hidden">
 
   <!-- ===== SCAN ===== -->
   <section id="scan-screen" class="screen active">
     <div class="hero-block">
       <h1 class="hero-title">Hunt smarter.</h1>
-      <p class="hero-sub">Snap any TCG card or sealed product. Get every price, on every platform, in one tap.</p>
+      <p class="hero-sub">Snap any TCG card or sealed product. Every price, every platform, in one tap.</p>
     </div>
-
     <div class="scan-actions">
       <label class="scan-cta primary">
         <span class="scan-icon">📷</span>
@@ -108,7 +106,7 @@
     </div>
 
     <div class="bulk-toggle">
-      <label><input type="checkbox" id="bulk-toggle" /> Bulk-scan mode <small>(auto-adds each scan to Buy List, perfect for in-store intake)</small></label>
+      <label><input type="checkbox" id="bulk-toggle" /> Bulk-scan mode <small>(auto-adds each scan to Buy List)</small></label>
       <div id="bulk-bar" class="bulk-bar hidden">
         <span>🛒 Bulk total</span>
         <strong id="bulk-total">$0.00</strong>
@@ -119,13 +117,41 @@
     <div class="quick-links">
       <button class="quick-link" data-screen="portfolio-screen"><span>📈</span><label>Portfolio</label></button>
       <button class="quick-link" data-screen="buylist-screen"><span>🛒</span><label>Buy List</label></button>
-      <button class="quick-link" data-screen="marketplace-screen"><span>🏪</span><label>Marketplace</label></button>
-      <button class="quick-link" data-screen="trends-screen"><span>📊</span><label>Trends</label></button>
+      <button class="quick-link" data-screen="marketplace-screen"><span>🏪</span><label>Market</label></button>
+      <button class="quick-link" data-screen="movers-screen"><span>📊</span><label>Movers</label></button>
+      <button class="quick-link" data-screen="trade-screen"><span>🤝</span><label>Trade</label></button>
+      <button class="quick-link" data-screen="customers-screen"><span>👥</span><label>Customers</label></button>
+      <button class="quick-link" data-screen="watchlist-screen"><span>⭐</span><label>Watch</label></button>
+      <button class="quick-link" data-screen="sealed-screen"><span>📦</span><label>Sealed EV</label></button>
     </div>
 
     <div class="recent-block">
       <h3 class="section-title">Recent scans</h3>
       <div id="recent-scans" class="recent-scans"></div>
+    </div>
+  </section>
+
+  <!-- ===== SCAN VIEWFINDER (camera modal-style) ===== -->
+  <section id="viewfinder-screen" class="screen viewfinder">
+    <div class="vf-head">
+      <button class="vf-close" id="vf-close">✕</button>
+      <select class="vf-tcg" id="vf-tcg">
+        <option value="pokemon">Pokémon</option>
+        <option value="mtg">Magic</option>
+        <option value="ygo">Yu-Gi-Oh</option>
+        <option value="sealed">Sealed</option>
+      </select>
+    </div>
+    <div class="vf-frame">
+      <div class="vf-corners"></div>
+      <div class="vf-hint">Scan the front of the card to get started.</div>
+    </div>
+    <div class="vf-bottom">
+      <label class="vf-icon-btn"><span>🖼</span><input type="file" accept="image/*" id="vf-gallery" hidden /></label>
+      <button class="vf-icon-btn" id="vf-settings">⚙</button>
+      <label class="vf-shutter"><input type="file" accept="image/*" capture="environment" id="vf-shutter" hidden /></label>
+      <div class="vf-total" id="vf-total">Total: $0.00</div>
+      <button class="vf-icon-btn done" id="vf-done">✓</button>
     </div>
   </section>
 
@@ -153,12 +179,21 @@
 
   <!-- ===== PORTFOLIO ===== -->
   <section id="portfolio-screen" class="screen">
+    <div class="portfolio-header" id="portfolio-header"></div>
     <div class="portfolio-summary" id="portfolio-summary"></div>
+    <div class="action-icons">
+      <button class="action-icon" id="ai-movers"><span class="ic">📊</span><label>Movers</label></button>
+      <button class="action-icon" id="ai-trade"><span class="ic">🤝</span><label>Trade</label></button>
+      <button class="action-icon" id="ai-bulk"><span class="ic">☑️</span><label>Bulk</label></button>
+      <button class="action-icon" id="ai-export"><span class="ic">📤</span><label>Export</label></button>
+      <button class="action-icon" id="ai-refresh"><span class="ic">🔄</span><label>Refresh</label></button>
+      <button class="action-icon" id="ai-share"><span class="ic">🔗</span><label>Share</label></button>
+    </div>
     <div class="tab-row">
       <button class="tab active" data-ptab="grid">Grid</button>
       <button class="tab" data-ptab="list">List</button>
       <button class="tab" data-ptab="sets">Sets</button>
-      <button class="tab" data-ptab="movers">Movers</button>
+      <button class="tab" data-ptab="recs">Recs</button>
     </div>
     <div class="search-box">
       <input id="portfolio-search" placeholder="Filter by name, set, condition…" />
@@ -167,6 +202,7 @@
         <option value="value-asc">Value: low → high</option>
         <option value="recent">Recently added</option>
         <option value="pl">P/L: best</option>
+        <option value="daily">Daily ▲ best</option>
         <option value="name">Name A-Z</option>
       </select>
     </div>
@@ -181,7 +217,9 @@
     <div class="buylist-totals" id="buylist-totals"></div>
     <div class="buylist-actions">
       <button class="btn btn-primary big" id="bl-show-customer">📱 Show Customer</button>
+      <button class="btn" id="bl-receipt">🧾 Receipt</button>
       <button class="btn" id="bl-portfolio">Move to Portfolio</button>
+      <button class="btn" id="bl-attach-customer">Attach to Customer</button>
       <button class="btn ghost" id="bl-clear">Clear list</button>
     </div>
   </section>
@@ -206,11 +244,53 @@
     <div id="marketplace-body"></div>
   </section>
 
+  <!-- ===== MOVERS ===== -->
+  <section id="movers-screen" class="screen">
+    <h2 class="screen-title">Market Movers</h2>
+    <p class="screen-sub">Today's biggest swings across all your portfolios.</p>
+    <div id="movers-body"></div>
+  </section>
+
+  <!-- ===== TRADE ANALYZER ===== -->
+  <section id="trade-screen" class="screen">
+    <h2 class="screen-title">Trade Analyzer</h2>
+    <p class="screen-sub">Build two stacks. We'll tell you who's getting the better deal.</p>
+    <div id="trade-body"></div>
+  </section>
+
+  <!-- ===== WATCHLIST ===== -->
+  <section id="watchlist-screen" class="screen">
+    <h2 class="screen-title">Watchlist</h2>
+    <p class="screen-sub">Set buy/sell targets. Get a browser alert the moment a card crosses.</p>
+    <div id="watch-status" class="results-status"></div>
+    <div id="watchlist-body"></div>
+  </section>
+
+  <!-- ===== CUSTOMERS ===== -->
+  <section id="customers-screen" class="screen">
+    <h2 class="screen-title">Customers</h2>
+    <p class="screen-sub">Track repeat buyers, store credit, transaction history.</p>
+    <button class="btn btn-primary big" id="cust-new">+ New Customer</button>
+    <div id="customers-body"></div>
+  </section>
+
+  <!-- ===== SEALED EV ===== -->
+  <section id="sealed-screen" class="screen">
+    <h2 class="screen-title">Sealed EV Calculator</h2>
+    <p class="screen-sub">Quick "is this booster box worth opening?" check.</p>
+    <div id="sealed-body"></div>
+  </section>
+
   <!-- ===== TRENDS ===== -->
   <section id="trends-screen" class="screen">
     <h2 class="screen-title">Market Trends</h2>
-    <p class="screen-sub">Top movers across your portfolio &amp; the platform.</p>
+    <p class="screen-sub">Top holdings + set breakdowns across all portfolios.</p>
     <div id="trends-body"></div>
+  </section>
+
+  <!-- ===== SHOWCASE (public read-only) ===== -->
+  <section id="showcase-screen" class="screen">
+    <div id="showcase-body"></div>
   </section>
 
 </main>
@@ -302,9 +382,7 @@
 </div>
 
 <div id="add-modal" class="modal hidden">
-  <div class="modal-body" id="add-modal-body">
-    <!-- filled dynamically -->
-  </div>
+  <div class="modal-body" id="add-modal-body"></div>
 </div>
 
 <div id="customer-modal" class="modal hidden">
@@ -342,12 +420,16 @@
     <h2>Settings</h2>
     <div class="setting-row"><strong>Signed in as</strong><span id="set-username">guest</span></div>
     <hr />
+    <div class="setting-header">Buy-desk offer %</div>
     <div class="setting-row"><strong>Cash offer %</strong><input type="number" id="set-cash-pct" value="70" min="10" max="100" /></div>
     <div class="setting-row"><strong>Trade offer %</strong><input type="number" id="set-trade-pct" value="80" min="10" max="100" /></div>
     <hr />
     <div class="setting-header">Marketplace profile <small>(needed to sell)</small></div>
     <div class="setting-row"><strong>PayPal.me handle</strong><input id="set-paypal-handle" placeholder="your-handle (no @)" /></div>
     <div class="setting-row"><strong>Ship-from address</strong><input id="set-shipping" placeholder="123 Main St, Navarre FL…" /></div>
+    <hr />
+    <div class="setting-header">Vendor mode</div>
+    <label class="toggle-row"><input type="checkbox" id="set-vendor" /> Show vendor inventory features (SKU, days-in-stock, customer ledger)</label>
     <hr />
     <div class="setting-header">API keys <small>(unlock live data when ready)</small></div>
     <div class="setting-row"><strong>eBay App ID</strong><input id="set-ebay-key" placeholder="paste key…" /></div>
@@ -356,18 +438,27 @@
     <button class="btn btn-primary" id="save-keys">Save settings</button>
     <hr />
     <button class="btn" id="install-pwa">📲 Install as app</button>
-    <button class="btn" id="export-data">Export data</button>
-    <button class="btn" id="import-data">Import data</button>
+    <button class="btn" id="enable-notifications">🔔 Enable price alerts</button>
+    <button class="btn" id="export-data">Export full backup</button>
+    <button class="btn" id="import-data">Import backup</button>
     <button class="btn danger" id="signout-btn">Sign out</button>
     <button class="btn danger" id="reset-all">Wipe local data</button>
     <hr />
-    <div class="setting-footnote">CARDBOARD HUNTERS · v0.1.0 · made for House of Cards</div>
+    <div class="setting-footnote">CARDBOARD HUNTERS · v0.2.0 · A House of Cards product</div>
     <button class="btn ghost" id="close-settings">Close</button>
   </div>
 </div>
 
 <div id="image-modal" class="modal hidden">
   <div class="modal-body image-modal-body" id="image-modal-body"></div>
+</div>
+
+<div id="receipt-modal" class="modal hidden">
+  <div class="modal-body" id="receipt-body"></div>
+</div>
+
+<div id="qr-modal" class="modal hidden">
+  <div class="modal-body" id="qr-body"></div>
 </div>
 
 <div id="toast"></div>
@@ -379,15 +470,18 @@
 
 <canvas id="confetti-canvas"></canvas>
 
-<!-- Tesseract.js for client-side OCR. Lazy-loaded only when scanning. -->
 <script>window.__TESSERACT_CDN__ = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';</script>
 
 <script src="js/storage.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/apis.js"></script>
 <script src="js/ocr.js"></script>
+<script src="js/analytics.js"></script>
 <script src="js/portfolio.js"></script>
 <script src="js/marketplace.js"></script>
+<script src="js/watchlist.js"></script>
+<script src="js/customers.js"></script>
+<script src="js/share.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/main.js"></script>
 </body>

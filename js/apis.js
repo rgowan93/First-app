@@ -471,10 +471,28 @@ const APIs = (function () {
     return null;
   }
 
+  /* Re-fetch a card and return new best estimated value for a condition */
+  async function refreshValue(cardId, cond) {
+    try {
+      const card = await getById(cardId);
+      if (!card) return null;
+      const res = computePricing(card, cond);
+      return { value: res.best, card };
+    } catch { return null; }
+  }
+
+  /* Best price as plain number for a card (ignores condition multipliers) */
+  function quickBest(card) {
+    const tcg = card.prices?.tcgplayer || {};
+    const cm  = card.prices?.cardmarket || {};
+    return tcg.holofoil ?? tcg.normal ?? tcg.reverseHolofoil ?? tcg.foil ?? cm.trend ?? cm.avg7 ?? null;
+  }
+
   return {
     searchAll, getById,
     searchPokemon, searchMTG, searchYGO, searchSealed,
     computePricing,
+    refreshValue, quickBest,
     fetchEbayActive,
     ebaySoldUrl, ebayActiveUrl, altUrl, pcUrl, tcgPlayerSearch,
     CONDITION_MULT, GRADER_BASE, GRADE_MULT,
