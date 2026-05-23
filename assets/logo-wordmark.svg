@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 140">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe066"/>
+      <stop offset="1" stop-color="#f5c518"/>
+    </linearGradient>
+  </defs>
+  <text x="180" y="60" font-family="'Arial Black','Helvetica Neue',sans-serif" font-weight="900" font-size="50" fill="url(#gold)" text-anchor="middle" stroke="#0e2a5c" stroke-width="2" paint-order="stroke">HOUSE</text>
+  <rect x="40" y="78" width="280" height="44" rx="8" fill="#1a4a8a" stroke="#0e2a5c" stroke-width="3"/>
+  <text x="180" y="110" font-family="'Arial Black','Helvetica Neue',sans-serif" font-weight="900" font-size="26" fill="#ffe066" text-anchor="middle" letter-spacing="2">OF CARDS</text>
+</svg>
