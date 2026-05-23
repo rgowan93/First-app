@@ -1,28 +1,24 @@
-/* ============================================================
-   SERVICE WORKER — offline cache
-   ============================================================ */
+/* Service worker — app shell cache, network-first for APIs */
 
-const CACHE = 'hoc-v1.0.0';
-const ASSETS = [
+const CACHE = 'cbh-v0.1.0';
+const SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
   './assets/icon.svg',
-  './assets/logo-wordmark.svg',
   './css/style.css',
   './js/storage.js',
-  './js/audio.js',
-  './js/data.js',
-  './js/payments.js',
-  './js/social.js',
-  './js/notifications.js',
-  './js/game.js',
+  './js/auth.js',
+  './js/apis.js',
+  './js/ocr.js',
+  './js/portfolio.js',
+  './js/marketplace.js',
   './js/ui.js',
   './js/main.js',
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).catch(() => {}));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).catch(() => {}));
   self.skipWaiting();
 });
 
@@ -33,12 +29,15 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  const url = new URL(e.request.url);
+  // Skip API requests — always go to network so prices stay fresh
+  if (/(pokemontcg\.io|scryfall\.com|ygoprodeck\.com|ebay\.com|tesseract)/.test(url.hostname)) return;
   e.respondWith(
     caches.match(e.request).then(cached => {
       const fetchProm = fetch(e.request).then(resp => {
         if (resp && resp.status === 200 && resp.type === 'basic') {
-          const respClone = resp.clone();
-          caches.open(CACHE).then(c => c.put(e.request, respClone));
+          const c2 = resp.clone();
+          caches.open(CACHE).then(c => c.put(e.request, c2));
         }
         return resp;
       }).catch(() => cached);

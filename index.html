@@ -2,16 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-<meta name="theme-color" content="#0e2a5c" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0e1a" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="mobile-web-app-capable" content="yes" />
-<meta name="description" content="HOUSE OF CARDS: Booster Tycoon — rip packs, collect original cards, battle the arena. Free to play." />
-<meta property="og:title" content="HOUSE OF CARDS: Booster Tycoon" />
-<meta property="og:description" content="I just pulled a Secret Rare in HOUSE OF CARDS! Rip your first pack and join me." />
-<meta property="og:type" content="website" />
-<title>HOUSE OF CARDS — Booster Tycoon</title>
+<meta name="description" content="CARDBOARD HUNTERS — TCG price scanner, portfolio, buy lists, and protected marketplace." />
+<title>CARDBOARD HUNTERS</title>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/svg+xml" href="assets/icon.svg" />
 <link rel="stylesheet" href="css/style.css" />
@@ -20,359 +17,377 @@
 
 <!-- ============ LOADING ============ -->
 <div id="loading-screen">
-  <div class="hoc-logo">
-    <div class="hoc-house">HOUSE</div>
-    <div class="hoc-of">OF CARDS</div>
+  <div class="logo-stack">
+    <div class="logo-mark">
+      <svg viewBox="0 0 64 64" width="56" height="56">
+        <rect x="6" y="10" width="38" height="50" rx="5" fill="#1a4a8a" stroke="#f5c518" stroke-width="3" transform="rotate(-8 25 35)"/>
+        <rect x="20" y="6" width="38" height="50" rx="5" fill="#f5c518" stroke="#0e2a5c" stroke-width="3" transform="rotate(8 40 28)"/>
+        <text x="36" y="38" text-anchor="middle" font-family="Arial Black" font-size="18" font-weight="900" fill="#0e2a5c" transform="rotate(8 40 28)">$</text>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <div class="logo-line-1">CARDBOARD</div>
+      <div class="logo-line-2">HUNTERS</div>
+    </div>
   </div>
-  <div class="hoc-sub">BOOSTER TYCOON</div>
   <div class="loading-bar"><div class="loading-fill"></div></div>
-  <div class="loading-tip">Shuffling the deck…</div>
+  <div class="loading-tip">Loading market data…</div>
 </div>
 
-<!-- ============ ONBOARDING ============ -->
-<div id="onboarding" class="modal hidden">
-  <div class="modal-body onboarding-body">
-    <div class="ob-slide active" data-slide="0">
-      <div class="ob-emoji">📦</div>
-      <h2>Welcome to House of Cards</h2>
-      <p>Build the biggest card binder in the world. Rip packs, complete the set, dominate the arena.</p>
+<!-- ============ AUTH ============ -->
+<div id="auth-screen" class="modal hidden">
+  <div class="modal-body auth-body">
+    <div class="logo-stack small">
+      <svg viewBox="0 0 64 64" width="48" height="48">
+        <rect x="6" y="10" width="38" height="50" rx="5" fill="#1a4a8a" stroke="#f5c518" stroke-width="3" transform="rotate(-8 25 35)"/>
+        <rect x="20" y="6" width="38" height="50" rx="5" fill="#f5c518" stroke="#0e2a5c" stroke-width="3" transform="rotate(8 40 28)"/>
+        <text x="36" y="38" text-anchor="middle" font-family="Arial Black" font-size="18" font-weight="900" fill="#0e2a5c" transform="rotate(8 40 28)">$</text>
+      </svg>
+      <div class="logo-text">
+        <div class="logo-line-1">CARDBOARD</div>
+        <div class="logo-line-2">HUNTERS</div>
+      </div>
     </div>
-    <div class="ob-slide" data-slide="1">
-      <div class="ob-emoji">👆</div>
-      <h2>Tap to Earn</h2>
-      <p>Tap your featured card to mint coins. Upgrade your tap power to earn millions per second.</p>
+    <p class="auth-sub">The intelligent TCG pricing &amp; portfolio platform.</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-auth-tab="signin">Sign in</button>
+      <button class="auth-tab" data-auth-tab="signup">Create account</button>
     </div>
-    <div class="ob-slide" data-slide="2">
-      <div class="ob-emoji">🟧</div>
-      <h2>Rip Packs &amp; Collect</h2>
-      <p>Open packs to pull 30 original cards — Common to Secret Rare. Each card mines passively.</p>
+    <div id="auth-signin" class="auth-pane active">
+      <input id="signin-user" placeholder="Username" autocomplete="username" />
+      <input id="signin-pass" type="password" placeholder="Password" autocomplete="current-password" />
+      <button class="btn btn-primary big" id="do-signin">Sign in</button>
+      <button class="btn ghost" id="continue-guest">Continue as guest →</button>
     </div>
-    <div class="ob-slide" data-slide="3">
-      <div class="ob-emoji">⚔️</div>
-      <h2>Battle the Arena</h2>
-      <p>Build a 3-card deck, climb the leaderboard, win gems &amp; battle pass XP.</p>
+    <div id="auth-signup" class="auth-pane">
+      <input id="signup-user" placeholder="Username" autocomplete="username" />
+      <input id="signup-email" type="email" placeholder="Email (optional)" autocomplete="email" />
+      <input id="signup-pass" type="password" placeholder="Password (min 6)" autocomplete="new-password" />
+      <button class="btn btn-primary big" id="do-signup">Create account</button>
     </div>
-    <div class="ob-slide" data-slide="4">
-      <div class="ob-emoji">🔥</div>
-      <h2>Pick your Collector name</h2>
-      <input id="ob-name" maxlength="16" placeholder="Collector name" />
-      <button class="btn btn-primary big" id="ob-start">Open Your First Pack</button>
-    </div>
-    <div class="ob-dots">
-      <span class="dot active"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
-    </div>
-    <button class="btn ghost" id="ob-next">Next →</button>
+    <div class="auth-legal">Demo build · accounts are local-only until backend is wired. Don't reuse a real password.</div>
   </div>
 </div>
 
 <!-- ============ TOP BAR ============ -->
 <header id="topbar" class="hidden">
-  <div class="brand-strip"><span>HOUSE</span><em>OF CARDS</em></div>
-  <div class="resource">
-    <span class="res-icon">💰</span>
-    <span class="res-val" id="coins">0</span>
+  <div class="brand-strip">
+    <svg viewBox="0 0 64 64" width="22" height="22">
+      <rect x="6" y="10" width="38" height="50" rx="5" fill="#1a4a8a" stroke="#f5c518" stroke-width="3" transform="rotate(-8 25 35)"/>
+      <rect x="20" y="6" width="38" height="50" rx="5" fill="#f5c518" stroke="#0e2a5c" stroke-width="3" transform="rotate(8 40 28)"/>
+    </svg>
+    <span>CARDBOARD <em>HUNTERS</em></span>
   </div>
-  <div class="resource gems-res" id="gems-button">
-    <span class="res-icon">💎</span>
-    <span class="res-val" id="gems">0</span>
-    <span class="plus">+</span>
-  </div>
+  <div class="topbar-spacer"></div>
+  <button class="icon-btn" id="buylist-btn" aria-label="Buy list">
+    🛒<span class="badge" id="buylist-badge">0</span>
+  </button>
   <button class="icon-btn" id="settings-btn" aria-label="Settings">⚙</button>
 </header>
 
 <!-- ============ GAME ============ -->
-<main id="game" class="hidden">
+<main id="app" class="hidden">
 
-  <!-- ===== MINE (tap) ===== -->
-  <section id="tap-screen" class="screen active">
-    <div class="level-row">
-      <div class="level-info">
-        <div class="level-name" id="player-name">Collector</div>
-        <div class="level-rank">Lv <span id="player-level">1</span> · <span id="player-title">Rookie Collector</span></div>
+  <!-- ===== SCAN ===== -->
+  <section id="scan-screen" class="screen active">
+    <div class="hero-block">
+      <h1 class="hero-title">Hunt smarter.</h1>
+      <p class="hero-sub">Snap any TCG card or sealed product. Get every price, on every platform, in one tap.</p>
+    </div>
+
+    <div class="scan-actions">
+      <label class="scan-cta primary">
+        <span class="scan-icon">📷</span>
+        <span class="scan-label">Snap a Card</span>
+        <input type="file" accept="image/*" capture="environment" id="scan-photo" hidden />
+      </label>
+      <button class="scan-cta secondary" id="search-manual">
+        <span class="scan-icon">🔎</span>
+        <span class="scan-label">Search by Name</span>
+      </button>
+    </div>
+
+    <div class="bulk-toggle">
+      <label><input type="checkbox" id="bulk-toggle" /> Bulk-scan mode <small>(auto-adds each scan to Buy List, perfect for in-store intake)</small></label>
+      <div id="bulk-bar" class="bulk-bar hidden">
+        <span>🛒 Bulk total</span>
+        <strong id="bulk-total">$0.00</strong>
+        <button class="btn small" id="bulk-done">Done →</button>
       </div>
-      <div class="xp-bar"><div class="xp-fill" id="xp-fill"></div><span id="xp-text">0 / 100</span></div>
     </div>
 
-    <div class="multiplier-row">
-      <div class="multi-badge hidden" id="vip-badge" title="VIP active">⭐ VIP</div>
-      <div class="multi-badge hidden" id="boost-badge">×<span id="boost-mult">1</span> <span id="boost-time">—</span></div>
-      <div class="multi-badge" id="streak-badge">🔥 <span id="streak-days">0</span>d</div>
-      <div class="multi-badge" id="rps-badge">⚡ <span id="rps">0</span>/s</div>
+    <div class="quick-links">
+      <button class="quick-link" data-screen="portfolio-screen"><span>📈</span><label>Portfolio</label></button>
+      <button class="quick-link" data-screen="buylist-screen"><span>🛒</span><label>Buy List</label></button>
+      <button class="quick-link" data-screen="marketplace-screen"><span>🏪</span><label>Marketplace</label></button>
+      <button class="quick-link" data-screen="trends-screen"><span>📊</span><label>Trends</label></button>
     </div>
 
-    <div class="active-beast-bar" id="active-beast-bar">
-      <div class="ab-name"><span id="ab-name">Bitsy</span> <span class="ab-tier" id="ab-tier">●</span></div>
-      <div class="ab-stats">+<span id="ab-rps">2</span>/s · Lv <span id="ab-level">1</span></div>
-      <button class="btn ghost small" id="change-beast">Change</button>
-    </div>
-
-    <div class="tap-area">
-      <div class="beast-stage" id="beast-stage">
-        <div class="beast-glow" id="beast-glow"></div>
-        <div class="beast" id="beast"><div class="beast-emoji" id="beast-emoji">🟠</div></div>
-      </div>
-      <div class="floating-layer" id="floating-layer"></div>
-    </div>
-
-    <div class="tap-stats">
-      <div>+<span id="per-tap">1</span> / tap</div>
-      <div>·</div>
-      <div><span id="rps2">0</span> / sec</div>
-    </div>
-
-    <div class="quick-actions">
-      <button class="qa" data-action="spin"><span>🎰</span><label>Spin</label><span class="badge" id="spin-badge">1</span></button>
-      <button class="qa" data-action="boost"><span>⚡</span><label>Boost</label></button>
-      <button class="qa" data-action="quests"><span>🎯</span><label>Quests</label><span class="badge" id="quest-badge">3</span></button>
-      <button class="qa" data-action="invite"><span>🎁</span><label>Invite</label></button>
+    <div class="recent-block">
+      <h3 class="section-title">Recent scans</h3>
+      <div id="recent-scans" class="recent-scans"></div>
     </div>
   </section>
 
-  <!-- ===== RIP (gacha) ===== -->
-  <section id="hatch-screen" class="screen">
-    <h2 class="screen-title">Rip Packs</h2>
-    <p class="screen-sub">Collect all 30 cards · <span id="dex-progress">0/30</span></p>
-
-    <div id="egg-list" class="egg-list"></div>
-
-    <div class="pity-card">
-      <div class="pity-label">Secret Rare Pity Counter</div>
-      <div class="pity-bar"><div class="pity-fill" id="pity-fill"></div></div>
-      <div class="pity-text"><span id="pity-text">0 / 80</span> packs until guaranteed Secret Rare</div>
+  <!-- ===== SEARCH RESULTS ===== -->
+  <section id="results-screen" class="screen">
+    <div class="results-head">
+      <button class="back-btn" data-back>← Back</button>
+      <h2 class="screen-title">Pick your card</h2>
     </div>
+    <div class="search-box">
+      <input id="results-search" placeholder="Refine: card name, set, number…" />
+    </div>
+    <div id="results-status" class="results-status"></div>
+    <div id="results-list" class="results-list"></div>
   </section>
 
-  <!-- ===== BINDER ===== -->
-  <section id="beasts-screen" class="screen">
-    <h2 class="screen-title">Binder</h2>
+  <!-- ===== CARD DETAIL ===== -->
+  <section id="card-screen" class="screen">
+    <div class="results-head">
+      <button class="back-btn" data-back>← Back</button>
+      <h2 class="screen-title">Card</h2>
+    </div>
+    <div id="card-detail"></div>
+  </section>
+
+  <!-- ===== PORTFOLIO ===== -->
+  <section id="portfolio-screen" class="screen">
+    <div class="portfolio-summary" id="portfolio-summary"></div>
     <div class="tab-row">
-      <button class="tab active" data-btab="all">All Cards</button>
-      <button class="tab" data-btab="owned">Owned</button>
-      <button class="tab" data-btab="taps">Tap Power</button>
+      <button class="tab active" data-ptab="grid">Grid</button>
+      <button class="tab" data-ptab="list">List</button>
+      <button class="tab" data-ptab="sets">Sets</button>
+      <button class="tab" data-ptab="movers">Movers</button>
     </div>
-    <div id="beasts-pane" class="beasts-pane"></div>
-    <div id="tap-upgrades-pane" class="upgrade-list hidden"></div>
+    <div class="search-box">
+      <input id="portfolio-search" placeholder="Filter by name, set, condition…" />
+      <select id="portfolio-sort">
+        <option value="value-desc">Value: high → low</option>
+        <option value="value-asc">Value: low → high</option>
+        <option value="recent">Recently added</option>
+        <option value="pl">P/L: best</option>
+        <option value="name">Name A-Z</option>
+      </select>
+    </div>
+    <div id="portfolio-body"></div>
   </section>
 
-  <!-- ===== ARENA / QUESTS ===== -->
-  <section id="quests-screen" class="screen">
-    <h2 class="screen-title">Arena &amp; Quests</h2>
+  <!-- ===== BUY LIST ===== -->
+  <section id="buylist-screen" class="screen">
+    <h2 class="screen-title">Buy List</h2>
+    <p class="screen-sub">Scan everything a customer brings in. Hand them the total.</p>
+    <div id="buylist-body"></div>
+    <div class="buylist-totals" id="buylist-totals"></div>
+    <div class="buylist-actions">
+      <button class="btn btn-primary big" id="bl-show-customer">📱 Show Customer</button>
+      <button class="btn" id="bl-portfolio">Move to Portfolio</button>
+      <button class="btn ghost" id="bl-clear">Clear list</button>
+    </div>
+  </section>
+
+  <!-- ===== MARKETPLACE ===== -->
+  <section id="marketplace-screen" class="screen">
+    <h2 class="screen-title">Marketplace</h2>
+    <p class="screen-sub">PayPal Goods &amp; Services only. Every sale buyer/seller protected.</p>
     <div class="tab-row">
-      <button class="tab active" data-qtab="arena">Arena</button>
-      <button class="tab" data-qtab="daily">Daily</button>
-      <button class="tab" data-qtab="achievements">Trophies</button>
-      <button class="tab" data-qtab="battlepass">Pass</button>
+      <button class="tab active" data-mtab="browse">Browse</button>
+      <button class="tab" data-mtab="mine">Listings</button>
+      <button class="tab" data-mtab="sales">My Sales <span class="dot-red hide" id="sales-dot"></span></button>
+      <button class="tab" data-mtab="sell">Sell</button>
     </div>
-    <div id="arena-pane" class="quest-pane active"></div>
-    <div id="daily-quests" class="quest-pane"></div>
-    <div id="achievements-list" class="quest-pane"></div>
-    <div id="battlepass-pane" class="quest-pane"></div>
+    <div class="search-box" id="market-search-box">
+      <input id="market-search" placeholder="Search marketplace…" />
+      <select id="market-filter">
+        <option value="all">All</option>
+        <option value="offers">Accepts offers</option>
+      </select>
+    </div>
+    <div id="marketplace-body"></div>
   </section>
 
-  <!-- ===== SHOP ===== -->
-  <section id="shop-screen" class="screen">
-    <h2 class="screen-title">Shop</h2>
-    <div class="shop-hero" id="starter-pack">
-      <div class="shop-hero-badge">LIMITED · ONE-TIME</div>
-      <div class="shop-hero-title">STARTER MEGA PACK</div>
-      <div class="shop-hero-content">
-        <div>💎 ×500</div>
-        <div>💰 ×1,000,000</div>
-        <div>🟪 ×3 Elite Packs</div>
-        <div>⚡ 24h ×3 Boost</div>
-      </div>
-      <div class="shop-hero-price">
-        <span class="old">$24.99</span>
-        <span class="new">$4.99</span>
-        <span class="save">80% OFF</span>
-      </div>
-      <button class="btn btn-cta" data-iap="starter">Claim Now</button>
-      <div class="countdown" id="starter-countdown">Ends in —</div>
-    </div>
-
-    <h3 class="section-title">Gems</h3>
-    <div class="gem-grid" id="gem-grid"></div>
-
-    <h3 class="section-title">VIP Subscription</h3>
-    <div class="vip-card">
-      <div class="vip-head">
-        <div class="vip-title">VIP ELITE</div>
-        <div class="vip-price">$9.99 / mo</div>
-      </div>
-      <ul class="vip-perks">
-        <li>×2 all earnings — forever</li>
-        <li>+5 daily Premium Packs</li>
-        <li>+100 daily gems</li>
-        <li>Exclusive VIP-only cards</li>
-        <li>Remove all ads</li>
-        <li>Gold VIP badge in arena</li>
-      </ul>
-      <button class="btn btn-vip" data-iap="vip">Start 3-day Free Trial</button>
-    </div>
-
-    <h3 class="section-title">No Ads</h3>
-    <div class="noads-card">
-      <div>Remove all ads forever</div>
-      <button class="btn btn-primary" data-iap="noads">$2.99</button>
-    </div>
-
-    <h3 class="section-title">Buy Real Cards</h3>
-    <a class="hoc-store-card" id="hoc-store-link" href="#" target="_blank" rel="noopener">
-      <div class="hoc-store-logo">
-        <div class="hoc-house" style="font-size:18px">HOUSE</div>
-        <div class="hoc-of"  style="font-size:11px">OF CARDS</div>
-      </div>
-      <div class="hoc-store-text">
-        <div class="hoc-store-title">Visit the real House of Cards shop</div>
-        <div class="hoc-store-sub">Real TCG cards, sealed product, singles &amp; more →</div>
-      </div>
-    </a>
+  <!-- ===== TRENDS ===== -->
+  <section id="trends-screen" class="screen">
+    <h2 class="screen-title">Market Trends</h2>
+    <p class="screen-sub">Top movers across your portfolio &amp; the platform.</p>
+    <div id="trends-body"></div>
   </section>
 
 </main>
 
 <!-- ============ BOTTOM NAV ============ -->
 <nav id="bottom-nav" class="hidden">
-  <button class="nav-btn active" data-screen="tap-screen"><span>🪙</span><label>Mine</label></button>
-  <button class="nav-btn" data-screen="hatch-screen"><span>📦</span><label>Rip</label><span class="dot-red hide" id="hatch-dot"></span></button>
-  <button class="nav-btn" data-screen="beasts-screen"><span>📕</span><label>Binder</label></button>
-  <button class="nav-btn" data-screen="quests-screen"><span>⚔️</span><label>Arena</label><span class="dot-red" id="quest-dot"></span></button>
-  <button class="nav-btn" data-screen="shop-screen"><span>🛒</span><label>Shop</label><span class="dot-red" id="shop-dot"></span></button>
+  <button class="nav-btn active" data-screen="scan-screen"><span>📷</span><label>Scan</label></button>
+  <button class="nav-btn" data-screen="portfolio-screen"><span>📈</span><label>Portfolio</label></button>
+  <button class="nav-btn" data-screen="buylist-screen"><span>🛒</span><label>Buy List</label></button>
+  <button class="nav-btn" data-screen="marketplace-screen"><span>🏪</span><label>Market</label></button>
+  <button class="nav-btn" data-screen="trends-screen"><span>📊</span><label>Trends</label></button>
 </nav>
 
 <!-- ============ MODALS ============ -->
-<div id="offline-modal" class="modal hidden">
-  <div class="modal-body">
-    <div class="big-emoji">💸</div>
-    <h2>Welcome back!</h2>
-    <p>Your cards earned while you were away:</p>
-    <div class="offline-earnings" id="offline-earnings">0</div>
-    <button class="btn btn-primary big" id="offline-claim">Claim</button>
-    <button class="btn btn-cta big" id="offline-claim2x">Claim ×2 (Watch Ad)</button>
-  </div>
-</div>
-
-<div id="dailylogin-modal" class="modal hidden">
-  <div class="modal-body">
-    <h2>Daily Reward</h2>
-    <div class="streak-grid" id="streak-grid"></div>
-    <button class="btn btn-primary big" id="claim-daily">Claim Day <span id="claim-day">1</span></button>
-  </div>
-</div>
-
-<div id="spin-modal" class="modal hidden">
-  <div class="modal-body">
-    <h2>Lucky Spin</h2>
-    <div class="wheel-wrap">
-      <div class="wheel-pointer"></div>
-      <div class="wheel" id="wheel"></div>
+<div id="scan-modal" class="modal hidden">
+  <div class="modal-body scan-modal-body">
+    <h2>Scanning…</h2>
+    <div class="scan-preview-wrap">
+      <img id="scan-preview" alt="" />
+      <div class="scan-overlay" id="scan-overlay">
+        <div class="spinner"></div>
+        <div id="scan-status">Reading card…</div>
+      </div>
     </div>
-    <div class="spin-count">Spins available: <strong id="spin-avail">0</strong></div>
-    <button class="btn btn-primary big" id="do-spin">SPIN</button>
-    <button class="btn btn-cta" id="spin-ad">+1 Free Spin (Watch Ad)</button>
-    <button class="btn ghost" id="close-spin">Close</button>
+    <button class="btn ghost" id="cancel-scan">Cancel</button>
   </div>
 </div>
 
-<div id="boost-modal" class="modal hidden">
+<div id="manual-modal" class="modal hidden">
   <div class="modal-body">
-    <h2>Boost Earnings</h2>
-    <div class="boost-grid">
-      <button class="boost-opt" data-boost="2,300,0"><span>×2</span><label>5 min</label><small>Free · Watch Ad</small></button>
-      <button class="boost-opt" data-boost="3,1800,50"><span>×3</span><label>30 min</label><small>💎 50</small></button>
-      <button class="boost-opt" data-boost="5,3600,200"><span>×5</span><label>1 hour</label><small>💎 200</small></button>
-      <button class="boost-opt" data-boost="10,86400,1000"><span>×10</span><label>24 hours</label><small>💎 1000</small></button>
+    <h2>Search by name</h2>
+    <input id="manual-input" placeholder="e.g. Charizard Base Set" autofocus />
+    <div class="tab-row tcg-picker">
+      <button class="tab active" data-tcg="pokemon">Pokémon</button>
+      <button class="tab" data-tcg="mtg">Magic</button>
+      <button class="tab" data-tcg="ygo">Yu-Gi-Oh</button>
+      <button class="tab" data-tcg="sealed">Sealed</button>
     </div>
-    <button class="btn ghost" id="close-boost">Close</button>
+    <button class="btn btn-primary big" id="manual-search">Search</button>
+    <button class="btn ghost" id="manual-close">Cancel</button>
   </div>
 </div>
 
-<div id="invite-modal" class="modal hidden">
+<div id="condition-modal" class="modal hidden">
   <div class="modal-body">
-    <h2>Invite Collectors</h2>
-    <p>Earn 💎 250 for every friend who joins.</p>
-    <div class="referral-code-row">
-      <code id="referral-code">LOADING</code>
-      <button class="btn" id="copy-code">Copy</button>
+    <h2>Condition</h2>
+    <p>Pick the condition that matches the card in hand.</p>
+    <div class="cond-section">
+      <h3>Raw card</h3>
+      <div class="cond-grid">
+        <button class="cond-btn" data-cond="NM">Near Mint<br><small>NM · 100%</small></button>
+        <button class="cond-btn" data-cond="LP">Lightly Played<br><small>LP · 85%</small></button>
+        <button class="cond-btn" data-cond="MP">Moderately Played<br><small>MP · 70%</small></button>
+        <button class="cond-btn" data-cond="HP">Heavily Played<br><small>HP · 50%</small></button>
+        <button class="cond-btn" data-cond="DMG">Damaged<br><small>DMG · 30%</small></button>
+      </div>
     </div>
-    <button class="btn btn-primary big" id="invite-share">Share Invite Link</button>
-    <button class="btn ghost" id="close-invite">Close</button>
+    <div class="cond-section">
+      <h3>Graded</h3>
+      <div class="grader-row">
+        <select id="grader-co">
+          <option value="">— grader —</option>
+          <option value="PSA">PSA</option>
+          <option value="CGC">CGC</option>
+          <option value="BGS">BGS</option>
+          <option value="SGC">SGC</option>
+          <option value="TAG">TAG</option>
+          <option value="ACE">ACE</option>
+        </select>
+        <select id="grader-grade">
+          <option value="">— grade —</option>
+          <option value="10">10</option>
+          <option value="9.5">9.5</option>
+          <option value="9">9</option>
+          <option value="8.5">8.5</option>
+          <option value="8">8</option>
+          <option value="7">7</option>
+          <option value="6">6</option>
+          <option value="5">5</option>
+          <option value="4">4</option>
+          <option value="3">3</option>
+          <option value="2">2</option>
+          <option value="1">1</option>
+        </select>
+        <button class="btn btn-cta" id="apply-graded">Apply</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="add-modal" class="modal hidden">
+  <div class="modal-body" id="add-modal-body">
+    <!-- filled dynamically -->
+  </div>
+</div>
+
+<div id="customer-modal" class="modal hidden">
+  <div class="modal-body customer-modal-body">
+    <h2>Cash offer</h2>
+    <div class="customer-display">
+      <div class="customer-row">
+        <span>Item count</span>
+        <strong id="cust-count">0</strong>
+      </div>
+      <div class="customer-row">
+        <span>Total market value</span>
+        <strong id="cust-market">$0.00</strong>
+      </div>
+      <hr />
+      <div class="customer-row big">
+        <span>💰 Cash offer</span>
+        <strong id="cust-cash" class="big-num">$0.00</strong>
+      </div>
+      <div class="customer-row big">
+        <span>🔄 Trade credit</span>
+        <strong id="cust-trade" class="big-num">$0.00</strong>
+      </div>
+    </div>
+    <div class="customer-toggles">
+      <label>Cash %  <input type="number" id="cash-pct" min="10" max="100" value="70" /></label>
+      <label>Trade % <input type="number" id="trade-pct" min="10" max="100" value="80" /></label>
+    </div>
+    <button class="btn ghost" id="cust-close">Close</button>
   </div>
 </div>
 
 <div id="settings-modal" class="modal hidden">
   <div class="modal-body">
     <h2>Settings</h2>
-    <label class="toggle"><input type="checkbox" id="set-sound" checked /> Sound</label>
-    <label class="toggle"><input type="checkbox" id="set-haptic" checked /> Vibration</label>
-    <label class="toggle"><input type="checkbox" id="set-notify" /> Daily reminders</label>
-    <label class="toggle"><input type="checkbox" id="set-particles" checked /> Particle effects</label>
+    <div class="setting-row"><strong>Signed in as</strong><span id="set-username">guest</span></div>
     <hr />
-    <button class="btn" id="install-pwa">📲 Install as App</button>
-    <button class="btn" id="export-save">Export Save</button>
-    <button class="btn" id="import-save">Import Save</button>
-    <button class="btn danger" id="reset-save">Reset Progress</button>
+    <div class="setting-row"><strong>Cash offer %</strong><input type="number" id="set-cash-pct" value="70" min="10" max="100" /></div>
+    <div class="setting-row"><strong>Trade offer %</strong><input type="number" id="set-trade-pct" value="80" min="10" max="100" /></div>
     <hr />
-    <div class="set-info">Collector ID: <code id="player-id">—</code></div>
-    <div class="set-info">Version 1.0.0 · A House of Cards game</div>
+    <div class="setting-header">Marketplace profile <small>(needed to sell)</small></div>
+    <div class="setting-row"><strong>PayPal.me handle</strong><input id="set-paypal-handle" placeholder="your-handle (no @)" /></div>
+    <div class="setting-row"><strong>Ship-from address</strong><input id="set-shipping" placeholder="123 Main St, Navarre FL…" /></div>
+    <hr />
+    <div class="setting-header">API keys <small>(unlock live data when ready)</small></div>
+    <div class="setting-row"><strong>eBay App ID</strong><input id="set-ebay-key" placeholder="paste key…" /></div>
+    <div class="setting-row"><strong>TCGplayer key</strong><input id="set-tcg-key" placeholder="paste key…" /></div>
+    <div class="setting-row"><strong>PayPal client ID</strong><input id="set-pp-key" placeholder="optional, partner-API only" /></div>
+    <button class="btn btn-primary" id="save-keys">Save settings</button>
+    <hr />
+    <button class="btn" id="install-pwa">📲 Install as app</button>
+    <button class="btn" id="export-data">Export data</button>
+    <button class="btn" id="import-data">Import data</button>
+    <button class="btn danger" id="signout-btn">Sign out</button>
+    <button class="btn danger" id="reset-all">Wipe local data</button>
+    <hr />
+    <div class="setting-footnote">CARDBOARD HUNTERS · v0.1.0 · made for House of Cards</div>
     <button class="btn ghost" id="close-settings">Close</button>
   </div>
 </div>
 
-<div id="purchase-modal" class="modal hidden">
-  <div class="modal-body">
-    <h2 id="purchase-title">Confirm Purchase</h2>
-    <div id="purchase-desc"></div>
-    <div class="purchase-price" id="purchase-price"></div>
-    <button class="btn btn-cta big" id="confirm-purchase">Purchase</button>
-    <button class="btn ghost" id="cancel-purchase">Cancel</button>
-    <div class="legal">Demo build — no real charge. Wire Stripe Checkout in <code>js/payments.js</code> to enable production payments.</div>
-  </div>
-</div>
-
-<div id="hatch-modal" class="modal hidden">
-  <div class="modal-body hatch-modal-body">
-    <div class="hatch-stage" id="hatch-stage"></div>
-    <button class="btn btn-primary big hidden" id="hatch-continue">Tap to continue</button>
-  </div>
-</div>
-
-<div id="beast-detail-modal" class="modal hidden">
-  <div class="modal-body" id="beast-detail"></div>
-</div>
-
-<div id="arena-result-modal" class="modal hidden">
-  <div class="modal-body" id="arena-result"></div>
-</div>
-
-<div id="ad-modal" class="modal hidden">
-  <div class="modal-body">
-    <h2>Sponsored</h2>
-    <div class="fake-ad">
-      <div class="ad-content" id="fake-ad-content"></div>
-      <div class="ad-timer">Reward in <span id="ad-counter">5</span>s…</div>
-    </div>
-    <button class="btn ghost" id="ad-close" disabled>Skip</button>
-    <div class="legal">Rewarded ad placeholder — replace with AdMob / Unity Ads SDK for production.</div>
-  </div>
+<div id="image-modal" class="modal hidden">
+  <div class="modal-body image-modal-body" id="image-modal-body"></div>
 </div>
 
 <div id="toast"></div>
 <div id="install-prompt" class="install-prompt hidden">
-  📲 Install HOUSE OF CARDS to play offline
+  📲 Install CARDBOARD HUNTERS
   <button id="install-yes">Install</button>
   <button id="install-no">✕</button>
 </div>
 
 <canvas id="confetti-canvas"></canvas>
 
+<!-- Tesseract.js for client-side OCR. Lazy-loaded only when scanning. -->
+<script>window.__TESSERACT_CDN__ = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';</script>
+
 <script src="js/storage.js"></script>
-<script src="js/audio.js"></script>
-<script src="js/data.js"></script>
-<script src="js/payments.js"></script>
-<script src="js/social.js"></script>
-<script src="js/notifications.js"></script>
-<script src="js/game.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/apis.js"></script>
+<script src="js/ocr.js"></script>
+<script src="js/portfolio.js"></script>
+<script src="js/marketplace.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/main.js"></script>
 </body>

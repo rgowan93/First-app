@@ -1,29 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#2a6fd6"/>
-      <stop offset="1" stop-color="#0e2a5c"/>
+      <stop offset="0" stop-color="#1a4a8a"/>
+      <stop offset="1" stop-color="#0a0e1a"/>
     </linearGradient>
-    <linearGradient id="goldBanner" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#ffe066"/>
       <stop offset="1" stop-color="#f5c518"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="96" fill="url(#bg)"/>
-  <!-- Card 1 -->
-  <g transform="translate(112 96) rotate(-12)">
-    <rect width="180" height="260" rx="16" fill="#f0e6d2" stroke="#1a4a8a" stroke-width="6"/>
-    <rect x="16" y="16" width="148" height="148" rx="8" fill="#1a4a8a"/>
-    <text x="90" y="125" font-family="Arial Black, sans-serif" font-size="72" font-weight="900" fill="#f5c518" text-anchor="middle">H</text>
-    <rect x="16" y="180" width="148" height="62" rx="6" fill="#1a4a8a"/>
-    <text x="90" y="222" font-family="Arial Black, sans-serif" font-size="28" font-weight="900" fill="#f5c518" text-anchor="middle">HOC</text>
+  <g transform="translate(256 256)">
+    <rect x="-130" y="-80" width="160" height="220" rx="16" fill="#1a4a8a" stroke="#f5c518" stroke-width="8" transform="rotate(-12)"/>
+    <rect x="-30" y="-140" width="160" height="220" rx="16" fill="url(#gold)" stroke="#0e2a5c" stroke-width="8" transform="rotate(12)"/>
+    <g transform="rotate(12) translate(50 -30)">
+      <text text-anchor="middle" font-family="Arial Black, sans-serif" font-size="120" font-weight="900" fill="#0e2a5c">$</text>
+    </g>
   </g>
-  <!-- Card 2 (front) -->
-  <g transform="translate(220 130) rotate(8)">
-    <rect width="180" height="260" rx="16" fill="#f0e6d2" stroke="#1a4a8a" stroke-width="6"/>
-    <rect x="16" y="16" width="148" height="148" rx="8" fill="url(#goldBanner)"/>
-    <text x="90" y="118" font-family="Arial Black, sans-serif" font-size="60" font-weight="900" fill="#1a4a8a" text-anchor="middle">★</text>
-    <text x="90" y="200" font-family="Arial Black, sans-serif" font-size="22" font-weight="900" fill="#1a4a8a" text-anchor="middle">HOUSE</text>
-    <text x="90" y="226" font-family="Arial Black, sans-serif" font-size="22" font-weight="900" fill="#1a4a8a" text-anchor="middle">OF CARDS</text>
-  </g>
+  <text x="256" y="450" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="38" font-weight="900" fill="#f5c518" letter-spacing="2">HUNTERS</text>
 </svg>

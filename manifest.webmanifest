@@ -1,16 +1,15 @@
 {
-  "name": "HOUSE OF CARDS: Booster Tycoon",
-  "short_name": "House of Cards",
-  "description": "Rip packs, collect 30 original cards, battle the arena. A House of Cards game.",
+  "name": "CARDBOARD HUNTERS — TCG Pricing & Portfolio",
+  "short_name": "Cardboard Hunters",
+  "description": "Scan any TCG card or sealed product, get every price on every platform, manage portfolio + buy lists, sell on a protected marketplace.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#08172e",
-  "theme_color": "#0e2a5c",
-  "categories": ["games", "entertainment"],
+  "background_color": "#0a0e1a",
+  "theme_color": "#0a0e1a",
+  "categories": ["business", "finance", "shopping", "utilities"],
   "icons": [
     { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
-  ],
-  "screenshots": []
+  ]
 }

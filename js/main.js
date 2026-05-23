@@ -1,9 +1,8 @@
 /* ============================================================
-   MAIN — bootstrapping, service worker, install prompt.
+   MAIN — bootstrap, service worker, install prompt.
    ============================================================ */
 
 (function () {
-  // ---- Loading screen fade ----
   function fadeLoading() {
     const ls = document.getElementById('loading-screen');
     if (!ls) return;
@@ -11,60 +10,32 @@
     setTimeout(() => ls.remove(), 500);
   }
 
-  // ---- Boot ----
-  function boot() {
+  async function boot() {
     try {
-      Game.init();
+      await Auth.ensureAdmin();
+      UI.boot();
+      fadeLoading();
     } catch (e) {
-      console.error('init failed', e);
-      alert('Game failed to load: ' + e.message);
-      return;
+      console.error('boot failed', e);
+      document.body.innerHTML = '<div style="padding:30px;color:white;text-align:center"><h2>Failed to boot</h2><pre style="text-align:left">' + (e.stack || e.message) + '</pre></div>';
     }
-
-    document.getElementById('topbar').classList.remove('hidden');
-    document.getElementById('game').classList.remove('hidden');
-    document.getElementById('bottom-nav').classList.remove('hidden');
-
-    UI.boot();
-    fadeLoading();
-
-    // Schedule notifications if enabled
-    const settings = Game.getSettings();
-    if (settings.notify && 'Notification' in window && Notification.permission === 'granted') {
-      Notify.scheduleDaily(Game.state, true);
-    }
-
-    // Save on page hide
-    addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        Storage.persist(Game.state);
-      }
-    });
-    addEventListener('beforeunload', () => Storage.persist(Game.state));
-
-    // Resume audio on first interaction (autoplay policy)
-    const resume = () => { try { Audio.ensureCtx(); } catch {} document.removeEventListener('click', resume); document.removeEventListener('touchstart', resume); };
-    document.addEventListener('click', resume, { once: true });
-    document.addEventListener('touchstart', resume, { once: true });
   }
 
-  // ---- Service Worker (PWA) ----
   if ('serviceWorker' in navigator) {
     addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW reg failed', err));
     });
   }
 
-  // ---- PWA install prompt ----
+  // PWA install
   let deferredPrompt = null;
   addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
     window.__deferredInstall = e;
-    // Show small banner after a delay so it isn't pushy
     setTimeout(() => {
       const banner = document.getElementById('install-prompt');
-      if (banner && !localStorage.getItem('hoc.installdismiss')) banner.classList.remove('hidden');
+      if (banner && !localStorage.getItem('cbh.installdismiss')) banner.classList.remove('hidden');
     }, 30000);
   });
   addEventListener('appinstalled', () => {
@@ -81,10 +52,9 @@
   });
   document.getElementById('install-no')?.addEventListener('click', () => {
     document.getElementById('install-prompt').classList.add('hidden');
-    localStorage.setItem('hoc.installdismiss', '1');
+    localStorage.setItem('cbh.installdismiss', '1');
   });
 
-  // Boot
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
     setTimeout(boot, 50);
   } else {
