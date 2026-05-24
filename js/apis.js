@@ -45,25 +45,46 @@ const APIs = (function () {
   // -------------------------------------------------------------
   // POKEMON TCG API
   // -------------------------------------------------------------
+  /* Parse a user query like "Unfezant 63/78" or "Charizard Base Set 4"
+     into { name, number } so we can hit api.pokemontcg.io's number filter. */
+  function parsePokemonQuery(query) {
+    const trimmed = (query || '').trim();
+    // Match "<name> <num>" or "<name> <num>/<total>"
+    const m = trimmed.match(/^(.+?)\s+(\d+)(?:\s*\/\s*\d+)?$/);
+    if (m) return { name: m[1].trim(), number: m[2] };
+    return { name: trimmed, number: null };
+  }
+  /* Strip Lucene special chars from a search term — keep letters/digits/space/dash/apostrophe */
+  function safeLucene(s) {
+    return (s || '').replace(/[+\-&|!(){}\[\]^"~*?:\\/]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
   async function searchPokemon(query, page = 1) {
     if (!query) return [];
-    // Build a fuzzy name query — accept "Charizard Base Set" by tokenising
-    const tokens = query.trim().split(/\s+/);
-    let q = `name:"${tokens[0]}*"`;
-    // Try common patterns: "Charizard" + extra → add as set name
-    if (tokens.length > 1) {
-      const rest = tokens.slice(1).join(' ');
-      q += ` (set.name:"${rest}*" OR number:"${rest}")`;
+    const { name, number } = parsePokemonQuery(query);
+    const cleanName = safeLucene(name);
+    if (!cleanName && !number) return [];
+    // Pokemon TCG API treats unquoted `name:foo bar` as an implicit AND on the
+    // name field, which fails when extras are actually set-name words. Use only
+    // the first name word as a wildcard prefix — most accurate single filter.
+    const firstWord = cleanName.split(' ')[0] || '';
+    const parts = [];
+    if (firstWord) parts.push(`name:${firstWord}*`);
+    if (number)    parts.push(`number:${number}`);
+    const q = parts.join(' ');
+    const url = `https://api.pokemontcg.io/v2/cards?q=${enc(q)}&pageSize=30&page=${page}&orderBy=-set.releaseDate`;
+    try {
+      const data = await J(url);
+      const results = (data.data || []).map(normalizePokemon);
+      if (results.length) return results;
+    } catch { /* fall through */ }
+    // Fallback: drop the number filter
+    if (firstWord) {
+      const url2 = `https://api.pokemontcg.io/v2/cards?q=${enc(`name:${firstWord}*`)}&pageSize=30&orderBy=-set.releaseDate`;
+      try { const d2 = await J(url2); return (d2.data || []).map(normalizePokemon); }
+      catch { return []; }
     }
-    const url = `https://api.pokemontcg.io/v2/cards?q=${enc(q)}&pageSize=20&page=${page}&orderBy=-set.releaseDate`;
-    let data;
-    try { data = await J(url); }
-    catch (e) {
-      // Fallback to simpler name-only search
-      const url2 = `https://api.pokemontcg.io/v2/cards?q=name:"${enc(tokens[0])}*"&pageSize=20`;
-      data = await J(url2);
-    }
-    return (data.data || []).map(normalizePokemon);
+    return [];
   }
 
   async function getPokemon(id) {
@@ -123,7 +144,11 @@ const APIs = (function () {
   // -------------------------------------------------------------
   async function searchMTG(query) {
     if (!query) return [];
-    const url = `https://api.scryfall.com/cards/search?q=${enc(query)}&order=released&dir=desc&unique=prints`;
+    // Scryfall is a fuzzy-matching name search. Filter very short / fragmented queries
+    // to avoid garbage matches when called as part of cross-TCG fallback.
+    const cleaned = (query || '').trim();
+    if (cleaned.length < 3) return [];
+    const url = `https://api.scryfall.com/cards/search?q=${enc(cleaned)}&order=released&dir=desc&unique=prints`;
     let data;
     try { data = await J(url); }
     catch { return []; }
@@ -175,7 +200,10 @@ const APIs = (function () {
   // -------------------------------------------------------------
   async function searchYGO(query) {
     if (!query) return [];
-    const url = `https://db.ygoprodeck.com/api/v7/cardinfo.php?fname=${enc(query)}&num=20&offset=0`;
+    // YGO `fname=` does a fuzzy substring search — strip numbers/slash to avoid 400s.
+    const cleaned = (query || '').replace(/[0-9\/]+/g, ' ').trim();
+    if (cleaned.length < 3) return [];
+    const url = `https://db.ygoprodeck.com/api/v7/cardinfo.php?fname=${enc(cleaned)}&num=20&offset=0`;
     let data;
     try { data = await J(url); }
     catch { return []; }
@@ -448,13 +476,20 @@ const APIs = (function () {
       case 'ygo':     return searchYGO(query);
       case 'sealed':  return searchSealed(query);
       default: {
-        // Best effort: try all in parallel
+        // Cross-TCG fallback — try all in parallel.
+        // If the query parses as "<name> <number>" it's almost certainly a Pokémon
+        // card (MTG uses collector numbers but rarely written by users like that),
+        // so we lead with Pokémon results.
+        const looksPokemon = /\d+(?:\s*\/\s*\d+)?$/.test(query.trim());
         const [pk, mtg, ygo] = await Promise.all([
           searchPokemon(query).catch(() => []),
           searchMTG(query).catch(() => []),
           searchYGO(query).catch(() => []),
         ]);
-        return [...pk, ...mtg, ...ygo].slice(0, 30);
+        const merged = looksPokemon
+          ? [...pk, ...mtg, ...ygo]
+          : [...pk, ...mtg, ...ygo];
+        return merged.slice(0, 30);
       }
     }
   }

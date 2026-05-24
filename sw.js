@@ -1,6 +1,6 @@
 /* Service worker — app shell cache, network-first for APIs */
 
-const CACHE = 'cbh-v0.2.0';
+const CACHE = 'cbh-v0.2.1';
 const SHELL = [
   './',
   './index.html',

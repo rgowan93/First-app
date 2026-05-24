@@ -130,25 +130,43 @@ const UI = (function () {
     $('scan-preview').src = url;
     $('scan-status').textContent = 'Loading OCR engine…';
     try {
-      const { lines } = await OCR.recognize(file, (p) => {
+      const { raw, lines } = await OCR.recognize(file, (p) => {
         if (p.status === 'recognizing text' && p.progress != null) $('scan-status').textContent = `Reading card… ${Math.round(p.progress * 100)}%`;
         else if (p.status) $('scan-status').textContent = p.status;
       });
       const candidates = OCR.extractCandidates(lines);
+      const tcg = OCR.detectTCG(raw);       // 'pokemon' | 'mtg' | 'ygo' | null
+      const num = OCR.extractNumber(raw);   // {number, total} | null
       if (!candidates.length) {
         m.classList.add('hidden'); URL.revokeObjectURL(url);
         toast('Could not read text — try Search by Name');
         return openManual('');
       }
-      $('scan-status').textContent = `Searching "${candidates[0]}"…`;
-      let results = await APIs.searchAll(candidates[0]);
+      // Build the best query: top candidate + detected number (huge accuracy bump)
+      const buildQuery = (cand) => num ? `${cand} ${num.number}/${num.total}` : cand;
+      const tryQuery = async (cand) => {
+        const q = buildQuery(cand);
+        $('scan-status').textContent = `Searching ${tcg ? tcg.toUpperCase() + ' · ' : ''}"${q}"…`;
+        // Search the detected TCG first; only fall back across all if zero
+        let r = tcg ? await APIs.searchAll(q, tcg) : await APIs.searchAll(q);
+        if (!r.length && tcg) r = await APIs.searchAll(q);
+        // If number-augmented search returns nothing, retry without the number
+        if (!r.length && num) {
+          $('scan-status').textContent = `Retrying "${cand}"…`;
+          r = tcg ? await APIs.searchAll(cand, tcg) : await APIs.searchAll(cand);
+          if (!r.length && tcg) r = await APIs.searchAll(cand);
+        }
+        return r;
+      };
+      let results = await tryQuery(candidates[0]);
       let cIdx = 1;
-      while (!results.length && cIdx < candidates.length) {
-        $('scan-status').textContent = `Searching "${candidates[cIdx]}"…`;
-        results = await APIs.searchAll(candidates[cIdx]); cIdx++;
-      }
+      while (!results.length && cIdx < candidates.length) { results = await tryQuery(candidates[cIdx]); cIdx++; }
       m.classList.add('hidden'); URL.revokeObjectURL(url);
-      if (!results.length) { toast('No matches — refine the name'); return openManual(candidates[0]); }
+      if (!results.length) {
+        const prefill = num ? `${candidates[0]} ${num.number}/${num.total}` : candidates[0];
+        toast(`No matches for "${candidates[0]}" — refine the name`);
+        return openManual(prefill);
+      }
       currentResults = results;
       if (bulkMode && results[0]) {
         const card = results[0]; const cond = { kind: 'raw', value: 'NM' };
@@ -229,7 +247,34 @@ const UI = (function () {
   function renderResults(results, statusMsg = '') {
     $('results-status').textContent = statusMsg;
     const list = $('results-list'); list.innerHTML = '';
-    if (!results.length) { list.appendChild(create('div', 'empty-state', 'No matches — refine your search.')); return; }
+    if (!results.length) {
+      const q = $('results-search').value.trim();
+      const helpBox = create('div', 'empty-state');
+      helpBox.innerHTML = `
+        <div style="font-weight:800;margin-bottom:8px">No matches for "${q}"</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Tips:
+          <ul style="text-align:left;margin:6px 0 0;padding-left:18px;line-height:1.6">
+            <li>For Pokémon, try just the <strong>name</strong> (e.g. <em>Unfezant</em>) — the number filter is strict.</li>
+            <li>Or use <strong>name + number</strong> (e.g. <em>Unfezant 63</em>) — skip the /total.</li>
+            <li>Check spelling; OCR sometimes mangles bold fonts.</li>
+          </ul>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">
+          ${q ? `<button class="btn btn-primary" id="r-retry-name">Search just "${(q.match(/^(\S+)/)?.[1] || q)}"</button>` : ''}
+          <button class="btn" id="r-open-manual">✏️ Edit search</button>
+        </div>`;
+      list.appendChild(helpBox);
+      const ret = $('r-retry-name');
+      if (ret) ret.onclick = async () => {
+        const term = (q.match(/^(\S+)/)?.[1] || q);
+        $('results-search').value = term;
+        renderResults([], `Searching "${term}"…`);
+        const r = await APIs.searchAll(term); currentResults = r;
+        renderResults(r, `${r.length} matches for "${term}"`);
+      };
+      $('r-open-manual').onclick = () => openManual(q);
+      return;
+    }
     for (const c of results) {
       const row = create('div', 'result-card');
       const price = APIs.quickBest(c);
